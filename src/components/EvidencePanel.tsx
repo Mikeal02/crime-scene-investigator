@@ -7,8 +7,14 @@ import {
   Droplets, 
   User, 
   Sword,
-  AlertTriangle
+  AlertTriangle,
+  Camera,
+  Package,
+  Flame,
+  Timer,
+  Activity
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface EvidencePanelProps {
   crimeCase: CrimeCase;
@@ -58,6 +64,14 @@ const weaponLabels: Record<string, string> = {
   poison: 'Suspected Poison',
   strangulation: 'Ligature Marks',
   none: 'No Weapon Found',
+};
+
+const environmentalLabels: Record<string, string> = {
+  broken_glass: 'Broken Glass',
+  overturned_furniture: 'Overturned Furniture',
+  scorch_marks: 'Scorch Marks',
+  water_damage: 'Water Damage',
+  none: 'None Detected',
 };
 
 export function EvidencePanel({ crimeCase }: EvidencePanelProps) {
@@ -117,10 +131,87 @@ export function EvidencePanel({ crimeCase }: EvidencePanelProps) {
             description="Recovered at crime scene"
           />
         )}
+
+        {evidence.surveillance && evidence.surveillance.available && (
+          <EvidenceCard
+            icon={<Camera className="w-5 h-5" />}
+            title="Surveillance"
+            value="Footage Available"
+            description={evidence.surveillance.description || 'Under review'}
+          />
+        )}
+
+        {evidence.environmentalDamage && evidence.environmentalDamage.type !== 'none' && (
+          <EvidenceCard
+            icon={<Flame className="w-5 h-5" />}
+            title="Environmental Damage"
+            value={environmentalLabels[evidence.environmentalDamage.type]}
+            description={evidence.environmentalDamage.description}
+          />
+        )}
       </div>
 
+      {/* Wounds Section */}
+      {evidence.wounds && evidence.wounds.length > 0 && (
+        <div className="mt-4 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+          <div className="flex items-center gap-2 text-destructive mb-3">
+            <Activity className="w-4 h-4" />
+            <span className="font-semibold text-sm">Wound Analysis</span>
+          </div>
+          <div className="space-y-2">
+            {evidence.wounds.map((wound, index) => (
+              <div key={index} className="text-sm">
+                <span className="text-foreground font-medium capitalize">{wound.type.replace('_', ' ')} wound</span>
+                <span className="text-muted-foreground"> - {wound.location}: </span>
+                <span className="text-muted-foreground italic">{wound.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Scene Objects */}
+      {evidence.sceneObjects && evidence.sceneObjects.length > 0 && (
+        <div className="mt-4 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+          <div className="flex items-center gap-2 text-primary mb-3">
+            <Package className="w-4 h-4" />
+            <span className="font-semibold text-sm">Objects at Scene</span>
+          </div>
+          <div className="grid grid-cols-1 gap-2">
+            {evidence.sceneObjects.map((obj, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full" />
+                <span className="text-foreground font-medium">{obj.name}</span>
+                <span className="text-muted-foreground">- {obj.condition}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Time Clues */}
+      {evidence.timeClues && evidence.timeClues.length > 0 && (
+        <div className="mt-4 p-4 bg-muted/50 border border-border rounded-lg">
+          <div className="flex items-center gap-2 text-foreground mb-3">
+            <Timer className="w-4 h-4" />
+            <span className="font-semibold text-sm">Time-Related Clues</span>
+          </div>
+          <div className="space-y-2">
+            {evidence.timeClues.map((clue, index) => (
+              <div key={index} className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{clue.description}</span>
+                <span className="text-foreground font-mono text-xs bg-background px-2 py-1 rounded">
+                  {clue.time.toLocaleTimeString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Red Herrings */}
       {redHerrings && redHerrings.length > 0 && (
-        <div className="mt-6 p-4 bg-warning/10 border border-warning/30 rounded-lg">
+        <div className="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg">
           <div className="flex items-center gap-2 text-warning mb-2">
             <AlertTriangle className="w-4 h-4" />
             <span className="font-semibold text-sm">Additional Findings</span>
@@ -148,8 +239,4 @@ export function EvidencePanel({ crimeCase }: EvidencePanelProps) {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }

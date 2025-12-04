@@ -8,104 +8,117 @@ export function validateReconstruction(
   const incorrectDeductions: string[] = [];
   const missingReasoning: string[] = [];
   let score = 0;
-
-  const { evidence, correctAnswers } = crimeCase;
-
+  
+  const { hiddenSolution, evidence } = crimeCase;
+  
   // Validate cause of death (30 points)
-  const userCause = userReconstruction.causeOfDeath.toLowerCase();
-  const causeMatch = correctAnswers.causeOfDeath.some(cause => 
-    userCause.includes(cause.toLowerCase())
+  const causeMatch = hiddenSolution.causeOfDeath.some(
+    cause => userReconstruction.causeOfDeath.toLowerCase().includes(cause.toLowerCase())
   );
   
   if (causeMatch) {
-    correctDeductions.push(`Correct cause of death identified based on ${evidence.bloodPattern} blood pattern${evidence.weaponFound ? ` and ${evidence.weaponFound} found at scene` : ''}.`);
+    correctDeductions.push('Correctly identified the cause of death');
     score += 30;
   } else {
-    incorrectDeductions.push(`Cause of death "${userReconstruction.causeOfDeath}" doesn't match evidence. The ${evidence.bloodPattern} blood pattern ${evidence.weaponFound ? `combined with ${evidence.weaponFound}` : ''} suggests ${correctAnswers.causeOfDeath[0]}.`);
+    incorrectDeductions.push(`Cause of death was ${hiddenSolution.causeOfDeath[0]}, not "${userReconstruction.causeOfDeath}"`);
   }
-
-  // Validate suspect direction (25 points)
-  if (userReconstruction.suspectDirection === correctAnswers.suspectDirection) {
-    correctDeductions.push(`Suspect movement correctly deduced from ${evidence.footprintType} footprints ${evidence.footprintDirection !== 'none' ? `pointing ${evidence.footprintDirection.replace('_', ' ')}` : ''}.`);
-    score += 25;
-  } else {
-    incorrectDeductions.push(`Suspect direction analysis incorrect. ${evidence.footprintType} footprints ${evidence.footprintDirection !== 'none' ? `heading ${evidence.footprintDirection.replace('_', ' ')}` : ''} indicate ${correctAnswers.suspectDirection.replace('_', ' ')}.`);
-  }
-
-  // Validate staging assessment (25 points)
-  if (userReconstruction.isStaged === correctAnswers.isStaged) {
-    if (correctAnswers.isStaged) {
-      correctDeductions.push('Correctly identified scene as staged. Evidence inconsistencies detected.');
-    } else {
-      correctDeductions.push('Correctly identified scene as genuine crime scene.');
-    }
-    score += 25;
-  } else {
-    if (correctAnswers.isStaged) {
-      incorrectDeductions.push('Scene appears staged but was marked as genuine. Look for contradictory evidence patterns.');
-    } else {
-      incorrectDeductions.push('Scene is genuine but was marked as staged. Evidence patterns are consistent.');
-    }
-  }
-
-  // Validate indoor/outdoor (20 points)
-  if (userReconstruction.isIndoor === correctAnswers.isIndoor) {
-    correctDeductions.push(`Correctly identified ${correctAnswers.isIndoor ? 'indoor' : 'outdoor'} scene based on ${evidence.weather} conditions and evidence preservation.`);
+  
+  // Validate suspect direction (20 points)
+  if (userReconstruction.suspectDirection === hiddenSolution.suspectDirection) {
+    correctDeductions.push('Correctly deduced suspect movement pattern');
     score += 20;
   } else {
-    incorrectDeductions.push(`Location analysis incorrect. ${evidence.weather} weather with ${evidence.footprintType !== 'none' ? 'preserved' : 'absent'} footprints suggests ${correctAnswers.isIndoor ? 'indoor' : 'outdoor'} crime scene.`);
+    incorrectDeductions.push(`Evidence suggests suspect ${hiddenSolution.suspectDirection.replace('_', ' ')}`);
   }
-
-  // Check for logical contradictions in user's reasoning
-  if (evidence.weather === 'rain' && !userReconstruction.isIndoor && evidence.footprintType !== 'none') {
-    missingReasoning.push('Consider: Clear footprints in rainy weather typically indicate indoor crime or recent activity.');
+  
+  // Validate staged determination (25 points)
+  if (userReconstruction.isStaged === hiddenSolution.isStaged) {
+    correctDeductions.push(
+      hiddenSolution.isStaged 
+        ? 'Correctly identified scene was staged' 
+        : 'Correctly determined scene was genuine'
+    );
+    score += 25;
+  } else {
+    incorrectDeductions.push(
+      hiddenSolution.isStaged 
+        ? 'Scene was staged - contradictions in evidence indicate manipulation' 
+        : 'Scene was genuine - no evidence of staging found'
+    );
   }
-
-  if (evidence.bloodPattern === 'splash' && userReconstruction.causeOfDeath.toLowerCase().includes('poison')) {
-    missingReasoning.push('Blood splash patterns are inconsistent with poisoning. Consider violent trauma.');
+  
+  // Validate indoor/outdoor (15 points)
+  if (userReconstruction.isIndoor === hiddenSolution.isIndoor) {
+    correctDeductions.push('Correctly determined crime scene location type');
+    score += 15;
+  } else {
+    incorrectDeductions.push(
+      hiddenSolution.isIndoor 
+        ? 'Evidence indicates an indoor crime scene' 
+        : 'Evidence indicates an outdoor crime scene'
+    );
   }
-
-  if (evidence.footprintType === 'multiple' && userReconstruction.suspectDirection === 'unknown') {
-    missingReasoning.push('Multiple footprints provide directional evidence. Analyze their patterns.');
+  
+  // Validate crime type if provided (10 points)
+  if (userReconstruction.crimeType) {
+    if (userReconstruction.crimeType === hiddenSolution.crimeType) {
+      correctDeductions.push(`Correctly identified as ${hiddenSolution.crimeType}`);
+      score += 10;
+    } else {
+      incorrectDeductions.push(`This was a ${hiddenSolution.crimeType}, not ${userReconstruction.crimeType}`);
+    }
   }
-
+  
+  // Check for logical consistency issues
+  const { weather, footprintType, bloodPattern } = evidence;
+  
+  // Weather and footprint consistency
+  if (weather === 'rain' && footprintType === 'barefoot' && !userReconstruction.isIndoor) {
+    if (userReconstruction.isStaged) {
+      correctDeductions.push('Correctly noted inconsistency: barefoot prints in rain suggests staging');
+    } else {
+      missingReasoning.push('Barefoot prints in heavy rain is inconsistent for outdoor crime');
+    }
+  }
+  
+  // Blood pattern and timeline consistency
+  if (bloodPattern === 'pool' && userReconstruction.timeline.toLowerCase().includes('quick')) {
+    missingReasoning.push('Blood pool formation suggests victim was stationary - contradicts quick timeline');
+  }
+  
+  // Weapon and cause consistency
+  if (evidence.weaponFound === 'firearm' && !userReconstruction.causeOfDeath.toLowerCase().includes('gun') && !userReconstruction.causeOfDeath.toLowerCase().includes('shot')) {
+    missingReasoning.push('Firearm found at scene should be considered in cause of death');
+  }
+  
+  if (evidence.weaponFound === 'knife' && !userReconstruction.causeOfDeath.toLowerCase().includes('stab') && !userReconstruction.causeOfDeath.toLowerCase().includes('cut')) {
+    missingReasoning.push('Sharp weapon at scene suggests stabbing or cutting injuries');
+  }
+  
+  // Surveillance evidence
+  if (evidence.surveillance?.available && evidence.surveillance.timeGap) {
+    if (!userReconstruction.timeline.toLowerCase().includes('gap') && 
+        !userReconstruction.timeline.toLowerCase().includes('missing')) {
+      missingReasoning.push('Surveillance footage gap should be accounted for in timeline');
+    }
+  }
+  
   // Determine verdict
   let verdict: 'consistent' | 'partial' | 'illogical';
-  if (score >= 80) {
+  if (score >= 80 && missingReasoning.length === 0) {
     verdict = 'consistent';
   } else if (score >= 50) {
     verdict = 'partial';
   } else {
     verdict = 'illogical';
   }
-
-  // Generate official reconstruction
-  const officialReconstruction = generateOfficialReconstruction(crimeCase);
-
+  
   return {
     score,
     verdict,
     correctDeductions,
     incorrectDeductions,
     missingReasoning,
-    officialReconstruction,
+    officialReconstruction: hiddenSolution.fullReconstruction,
   };
-}
-
-function generateOfficialReconstruction(crimeCase: CrimeCase): string {
-  const { evidence, correctAnswers } = crimeCase;
-  const timeStr = evidence.timeOfDeath.toLocaleString();
-
-  const parts = [
-    `Based on forensic analysis, the victim died approximately at ${timeStr}.`,
-    `Weather conditions were ${evidence.weather}, which ${correctAnswers.isIndoor ? 'did not affect the indoor crime scene' : 'influenced evidence preservation'}.`,
-    `${evidence.footprintType !== 'none' ? `${evidence.footprintType.charAt(0).toUpperCase() + evidence.footprintType.slice(1)} prints ${evidence.footprintDirection !== 'none' ? `leading ${evidence.footprintDirection.replace('_', ' ')}` : 'were found at the scene'}` : 'No footprints were recovered'}.`,
-    `Blood evidence shows ${evidence.bloodPattern !== 'none' ? `a ${evidence.bloodPattern} pattern` : 'minimal blood'}, consistent with ${correctAnswers.causeOfDeath[0]}.`,
-    evidence.weaponFound && evidence.weaponFound !== 'none' ? `A ${evidence.weaponFound} was recovered as the likely murder weapon.` : '',
-    evidence.bodyPosition ? `The body was found ${evidence.bodyPosition.replace('_', ' ')}.` : '',
-    `The crime scene ${correctAnswers.isStaged ? 'shows signs of staging and evidence manipulation' : 'appears to be undisturbed'}.`,
-    `Classification: ${correctAnswers.isIndoor ? 'Indoor' : 'Outdoor'} homicide.`,
-  ];
-
-  return parts.filter(Boolean).join(' ');
 }

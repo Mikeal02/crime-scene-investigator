@@ -1,10 +1,24 @@
 import { CrimeCase } from '@/types/crime';
 import { Badge } from '@/components/ui/badge';
 import { Shield, Calendar, MapPin } from 'lucide-react';
+import { VictimProfile } from './VictimProfile';
 
 interface CaseHeaderProps {
   crimeCase: CrimeCase;
 }
+
+const locationLabels: Record<CrimeCase['location'], string> = {
+  forest: 'Blackwood Forest',
+  apartment: 'Downtown Apartment',
+  street: 'Main Street Alley',
+  office: 'Corporate Office Building',
+  factory: 'Industrial Factory',
+  hotel: 'Grand Hotel',
+  warehouse: 'Abandoned Warehouse',
+  parking_lot: 'Underground Parking',
+  rooftop: 'High-Rise Rooftop',
+  basement: 'Building Basement',
+};
 
 export function CaseHeader({ crimeCase }: CaseHeaderProps) {
   const difficultyColors = {
@@ -18,7 +32,7 @@ export function CaseHeader({ crimeCase }: CaseHeaderProps) {
       {/* Crime tape decoration */}
       <div className="absolute top-0 left-0 right-0 h-2 crime-tape opacity-60" />
       
-      <div className="pt-6 pb-4">
+      <div className="pt-6 pb-4 space-y-4">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -35,7 +49,7 @@ export function CaseHeader({ crimeCase }: CaseHeaderProps) {
               </span>
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
-                Crime Scene Alpha
+                {locationLabels[crimeCase.location]}
               </span>
             </div>
           </div>
@@ -47,6 +61,14 @@ export function CaseHeader({ crimeCase }: CaseHeaderProps) {
             {crimeCase.difficulty}
           </Badge>
         </div>
+        
+        {/* Story Intro */}
+        <div className="p-4 bg-muted/30 border-l-2 border-primary/50 italic text-muted-foreground">
+          {crimeCase.storyIntro}
+        </div>
+        
+        {/* Victim Profile */}
+        <VictimProfile victim={crimeCase.victim} />
       </div>
       
       {/* Bottom border */}
