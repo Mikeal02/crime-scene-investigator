@@ -18,6 +18,10 @@ const locationLabels: Record<CrimeCase['location'], string> = {
   parking_lot: 'Underground Parking',
   rooftop: 'High-Rise Rooftop',
   basement: 'Building Basement',
+  abandoned_hospital: 'St. Mercy Abandoned Hospital',
+  cemetery: 'Hillcrest Cemetery',
+  construction_site: 'Unfinished Tower Site',
+  sewers: 'City Sewer System',
 };
 
 export function CaseHeader({ crimeCase }: CaseHeaderProps) {
