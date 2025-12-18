@@ -15,6 +15,8 @@ export default {
     extend: {
       fontFamily: {
         typewriter: ['"Special Elite"', 'cursive'],
+        terminal: ['"VT323"', 'monospace'],
+        clinical: ['"Courier Prime"', 'monospace'],
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
@@ -62,6 +64,10 @@ export default {
         evidence: "hsl(var(--evidence))",
         blood: "hsl(var(--blood))",
         tape: "hsl(var(--tape))",
+        rust: "hsl(var(--rust))",
+        sickly: "hsl(var(--sickly))",
+        cold: "hsl(var(--cold))",
+        decay: "hsl(var(--decay))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -88,14 +94,20 @@ export default {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--blood) / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(var(--blood) / 0.5)" },
+        },
+        "drip": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "50%": { opacity: "1" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "drip": "drip 3s ease-in-out infinite",
       },
     },
   },
