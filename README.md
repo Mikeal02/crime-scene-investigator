@@ -1,73 +1,176 @@
-# Welcome to your Lovable project
+# Crime Scene Investigator
 
-## Project info
+**Crime Scene Investigator** is an interactive web application that lets users explore and analyze simulated crime scenes through a clean, responsive UI.  
+The app is built with React and TypeScript using Vite and styled with Tailwind CSS and shadcn‑ui.
 
-**URL**: https://lovable.dev/projects/b67194e4-ba1d-4e57-90f5-a8f075ea0a49
+This project demonstrates modern frontend engineering, UI design, and interactive data exploration.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 📌 Project Overview
 
-**Use Lovable**
+Crime Scene Investigator helps users:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b67194e4-ba1d-4e57-90f5-a8f075ea0a49) and start prompting.
+- Explore simulated crime scenes or datasets
+- View evidence details and patterns
+- Interact with elements and navigate data intuitively
+- Use a structured, readable interface to study forensic scenarios
 
-Changes made via Lovable will be committed automatically to this repo.
+_(Add a short tagline here if the project has a specific focus, like “AI enhanced evidence analysis” or “mystery exploration tool.”)_
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠 Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+| Area | Technology |
+|------|------------|
+| Frontend | React |
+| Language | TypeScript |
+| Bundler | Vite |
+| Styling | Tailwind CSS + shadcn‑ui |
+| Deployment | Vercel / Netlify / Static hosting |
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 📁 Project Structure
+```bash
+📦 crime‑scene‑investigator
+├── public/ # Static assets
+│ └── images/ # Screenshot assets for README
+├── src/ # React source code
+│ ├── components/ # UI components
+│ ├── pages/ # View pages
+│ └── styles/ # Tailwind/css utilities
+├── index.html # Main template
+├── package.json # Project metadata & scripts
+├── tsconfig.json # TypeScript config
+├── tailwind.config.ts # Tailwind configuration
+├── vite.config.ts # Vite config
+└── README.md # Documentation
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🖼️ Screenshots (Add Visuals)
 
-**Use GitHub Codespaces**
+Upload the following images into `public/images/` and update paths below.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 🧠 Home / Landing Screen
 
-## What technologies are used for this project?
+**File:**  
 
-This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+public/images/home.png
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/b67194e4-ba1d-4e57-90f5-a8f075ea0a49) and click on Share -> Publish.
+**What to add:**  
+Screenshot of the app’s main landing view showing navbar and primary UI.
 
-## Can I connect a custom domain to my Lovable project?
+```markdown
+![Home Screen](public/images/home.png)
 
-Yes, you can!
+🕵️ Crime Scene View
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+File:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+public/images/crime‑scene.png
+
+
+What to add:
+Screenshot showing the main crime scene interface or data explorer.
+
+![Crime Scene View](public/images/crime‑scene.png)
+
+📊 Evidence / Detail Panel
+
+File:
+
+public/images/evidence‑panel.png
+
+
+What to add:
+Screenshot of an evidence detail or information panel (list, card, modal, etc.).
+
+![Evidence Panel](public/images/evidence‑panel.png)
+```
+---
+
+🚀 Installation & Setup
+Prerequisites
+
+Node.js v16 or higher
+
+npm or yarn installed
+
+Steps
+
+1. Clone the repo
+```bash
+git clone https://github.com/Mikeal02/crime-scene-investigator.git
+cd crime-scene-investigator
+```
+
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Run locally
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+4. Open in browser
+```bash
+Visit:
+http://localhost:5173
+```
+---
+👩‍💻 Usage
+
+Navigate through crime scenes or data views
+
+Click elements to view details
+
+Explore relationships and patterns
+
+(Add any specific instructions once the UI interactions are finalized.)
+
+---
+
+📦 Build for Production
+
+To generate a production build:
+```bash
+npm run build
+# or
+yarn build
+```
+
+The output will be in the dist/ folder.
+
+---
+
+🤝 Contributing
+
+Contributions are welcome! To contribute:
+
+Fork the repository
+
+Create a feature branch
+
+Commit your changes
+
+Push your branch
+
+Open a pull request
+
+---
+
+📄 License
+
+Distributed under the MIT License. See LICENSE for details.
