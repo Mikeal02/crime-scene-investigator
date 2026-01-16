@@ -7,10 +7,11 @@ import { EvidencePanel } from '@/components/EvidencePanel';
 import { ReconstructionForm } from '@/components/ReconstructionForm';
 import { ResultsPanel } from '@/components/ResultsPanel';
 import { DifficultySelector } from '@/components/DifficultySelector';
-import { CrimeSceneMap } from '@/components/CrimeSceneMap';
+import { AdvancedCrimeScene } from '@/components/AdvancedCrimeScene';
+import { ComplexInvestigationPanel } from '@/components/ComplexInvestigationPanel';
+import { ScareEventSystem } from '@/components/ScareEventSystem';
 import { AudioController } from '@/components/AudioController';
 import { InvestigatorProfile } from '@/components/InvestigatorProfile';
-import { TypewriterText } from '@/components/TypewriterText';
 import { GlitchText } from '@/components/GlitchText';
 import { Button } from '@/components/ui/button';
 import { 
@@ -35,6 +36,8 @@ export default function Index() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [warningStep, setWarningStep] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
+  const [investigationProgress, setInvestigationProgress] = useState(0);
+  const [scareEnabled, setScareEnabled] = useState(true);
 
   // Blinking cursor effect
   useEffect(() => {
@@ -359,11 +362,26 @@ export default function Index() {
 
         {/* Investigating State */}
         {gameState === 'investigating' && currentCase && (
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-7xl mx-auto space-y-6">
+            {/* Scare Event System */}
+            <ScareEventSystem 
+              enabled={scareEnabled} 
+              intensity={difficulty === 'expert' ? 'high' : difficulty === 'intermediate' ? 'medium' : 'low'} 
+            />
+            
             <CaseHeader crimeCase={currentCase} />
 
-            {/* Crime Scene Map */}
-            <CrimeSceneMap crimeCase={currentCase} />
+            {/* Advanced Crime Scene with particles */}
+            <AdvancedCrimeScene 
+              crimeCase={currentCase} 
+              onInvestigationProgress={setInvestigationProgress}
+            />
+            
+            {/* Complex Investigation Panel */}
+            <ComplexInvestigationPanel 
+              crimeCase={currentCase}
+              investigationProgress={investigationProgress}
+            />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="case-file p-6">
