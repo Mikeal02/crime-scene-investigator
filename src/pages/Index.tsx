@@ -7,6 +7,11 @@ import { EvidencePanel } from '@/components/EvidencePanel';
 import { ReconstructionForm } from '@/components/ReconstructionForm';
 import { ResultsPanel } from '@/components/ResultsPanel';
 import { DifficultySelector } from '@/components/DifficultySelector';
+import { CrimeSceneMap } from '@/components/CrimeSceneMap';
+import { AudioController } from '@/components/AudioController';
+import { InvestigatorProfile } from '@/components/InvestigatorProfile';
+import { TypewriterText } from '@/components/TypewriterText';
+import { GlitchText } from '@/components/GlitchText';
 import { Button } from '@/components/ui/button';
 import { 
   Skull, 
@@ -16,7 +21,8 @@ import {
   AlertTriangle,
   Shield,
   Lock,
-  Terminal
+  Terminal,
+  Map
 } from 'lucide-react';
 
 type GameState = 'warning' | 'menu' | 'investigating' | 'results';
@@ -205,6 +211,9 @@ export default function Index() {
         <div className="absolute w-full h-px bg-foreground/5 animate-scan-line" />
       </div>
 
+      {/* Audio Controller */}
+      <AudioController />
+
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
@@ -215,25 +224,29 @@ export default function Index() {
               </div>
               <div>
                 <h1 className="font-typewriter text-lg md:text-xl text-foreground tracking-wider">
-                  EVIDENCE ARCHIVE
+                  <GlitchText text="EVIDENCE ARCHIVE" intensity="low" continuous />
                 </h1>
                 <p className="text-xs text-muted-foreground font-terminal tracking-widest hidden sm:block">
                   CASE FILE DATABASE // CLEARANCE LEVEL: UNRESTRICTED
                 </p>
               </div>
             </div>
-            
-            {gameState !== 'menu' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNewCase}
-                className="border-border text-muted-foreground hover:text-foreground hover:border-blood/50 horror-button"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Abandon Investigation
-              </Button>
-            )}
+
+            <div className="flex items-center gap-3">
+              <InvestigatorProfile />
+              
+              {gameState !== 'menu' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNewCase}
+                  className="border-border text-muted-foreground hover:text-foreground hover:border-blood/50 horror-button"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Abandon Investigation
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -348,6 +361,9 @@ export default function Index() {
         {gameState === 'investigating' && currentCase && (
           <div className="max-w-6xl mx-auto space-y-6">
             <CaseHeader crimeCase={currentCase} />
+
+            {/* Crime Scene Map */}
+            <CrimeSceneMap crimeCase={currentCase} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="case-file p-6">
