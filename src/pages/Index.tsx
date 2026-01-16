@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { CrimeCase, UserReconstruction, ValidationResult } from '@/types/crime';
 import { generateCrimeCase } from '@/lib/crimeGenerator';
 import { validateReconstruction } from '@/lib/logicValidator';
@@ -10,9 +10,11 @@ import { DifficultySelector } from '@/components/DifficultySelector';
 import { AdvancedCrimeScene } from '@/components/AdvancedCrimeScene';
 import { ComplexInvestigationPanel } from '@/components/ComplexInvestigationPanel';
 import { ScareEventSystem } from '@/components/ScareEventSystem';
-import { AudioController } from '@/components/AudioController';
+import { LocationAmbientAudio } from '@/components/LocationAmbientAudio';
 import { InvestigatorProfile } from '@/components/InvestigatorProfile';
 import { GlitchText } from '@/components/GlitchText';
+import { EvidenceChainSystem } from '@/components/EvidenceChainSystem';
+import { CaseHistoryTracker, saveCaseToHistory } from '@/components/CaseHistoryTracker';
 import { Button } from '@/components/ui/button';
 import { 
   Skull, 
@@ -38,6 +40,9 @@ export default function Index() {
   const [showCursor, setShowCursor] = useState(true);
   const [investigationProgress, setInvestigationProgress] = useState(0);
   const [scareEnabled, setScareEnabled] = useState(true);
+  const [chainProgress, setChainProgress] = useState(0);
+  const investigationStartTime = useRef<number>(0);
+  const [viewedEvidence, setViewedEvidence] = useState<Set<string>>(new Set());
 
   // Blinking cursor effect
   useEffect(() => {
@@ -58,6 +63,10 @@ export default function Index() {
     setCurrentCase(newCase);
     setResult(null);
     setGameState('investigating');
+    setInvestigationProgress(0);
+    setChainProgress(0);
+    setViewedEvidence(new Set());
+    investigationStartTime.current = Date.now();
   }, [difficulty]);
 
   const handleSubmit = useCallback((reconstruction: UserReconstruction) => {
@@ -70,8 +79,20 @@ export default function Index() {
       setResult(validationResult);
       setGameState('results');
       setIsSubmitting(false);
+      
+      // Save to history
+      const duration = Math.round((Date.now() - investigationStartTime.current) / 1000);
+      saveCaseToHistory(
+        currentCase,
+        validationResult,
+        duration,
+        viewedEvidence.size,
+        15, // approximate total evidence
+        { crimeType: reconstruction.crimeType, wasStaged: reconstruction.isStaged }
+      );
+      window.dispatchEvent(new Event('case-history-updated'));
     }, 3000);
-  }, [currentCase]);
+  }, [currentCase, viewedEvidence]);
 
   const handleNewCase = useCallback(() => {
     setGameState('menu');
@@ -214,9 +235,6 @@ export default function Index() {
         <div className="absolute w-full h-px bg-foreground/5 animate-scan-line" />
       </div>
 
-      {/* Audio Controller */}
-      <AudioController />
-
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
@@ -236,6 +254,7 @@ export default function Index() {
             </div>
 
             <div className="flex items-center gap-3">
+              <CaseHistoryTracker />
               <InvestigatorProfile />
               
               {gameState !== 'menu' && (
@@ -369,6 +388,9 @@ export default function Index() {
               intensity={difficulty === 'expert' ? 'high' : difficulty === 'intermediate' ? 'medium' : 'low'} 
             />
             
+            {/* Location-based Ambient Audio */}
+            <LocationAmbientAudio location={currentCase.location} />
+            
             <CaseHeader crimeCase={currentCase} />
 
             {/* Advanced Crime Scene with particles */}
@@ -377,10 +399,16 @@ export default function Index() {
               onInvestigationProgress={setInvestigationProgress}
             />
             
+            {/* Evidence Chain System - Complex clue progression */}
+            <EvidenceChainSystem 
+              crimeCase={currentCase}
+              onProgressUpdate={setChainProgress}
+            />
+            
             {/* Complex Investigation Panel */}
             <ComplexInvestigationPanel 
               crimeCase={currentCase}
-              investigationProgress={investigationProgress}
+              investigationProgress={Math.max(investigationProgress, chainProgress)}
             />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
